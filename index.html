@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Жовтогриве Левеня — Дитяча Книга</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(180deg, #F0F9FF 0%, #FEFCE8 100%);
+            min-height: 100vh;
+            margin: 0;
+        }
+        .title-font {
+            font-family: 'Comfortaa', cursive;
+        }
+
+        /* Надійне перемикання сторінок на чистому CSS */
+        .page-slide {
+            display: none;
+            width: 100%;
+            height: 100%;
+            background: white;
+        }
+        .page-slide.active {
+            display: block;
+        }
+
+        /* Головні кнопки меню */
+        .nav-btn {
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            background-color: #ffffff;
+            color: #334155;
+            border: 2px solid #e2e8f0;
+        }
+        .nav-btn:hover {
+            background-color: #fffbeb;
+        }
+        .nav-btn.active {
+            background-color: #fbbf24;
+            color: #451a03;
+            border-color: #f59e0b;
+        }
+
+        /* ПЕРЕМИКАЧ ДЛЯ МАСКИ ТА КРІПЛЕННЯ (Вкладка 4) */
+        #mask-subnav {
+            display: none;
+            justify-content: center;
+            gap: 10px;
+            background-color: #fef3c7;
+            padding: 8px 16px;
+            border-radius: 16px;
+            border: 2px solid #f59e0b;
+            margin-top: -8px;
+        }
+        #mask-subnav.visible {
+            display: flex;
+        }
+        .sub-btn {
+            padding: 6px 14px;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 14px;
+            cursor: pointer;
+            background-color: #ffffff;
+            color: #475569;
+            border: 2px solid #cbd5e1;
+        }
+        .sub-btn.active {
+            background-color: #d97706;
+            color: #ffffff;
+            border-color: #b45309;
+        }
+        
+        @media print {
+            body {
+                background: white !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            #web-interface {
+                display: none !important;
+            }
+            #print-area {
+                display: block !important;
+            }
+            .print-page {
+                display: block !important;
+                width: 297mm;
+                height: 210mm;
+                page-break-after: always;
+                break-after: page;
+                box-sizing: border-box;
+                padding: 0;
+                margin: 0;
+            }
+            @page {
+                size: A4 landscape;
+                margin: 0;
+            }
+        }
+        #print-area {
+            display: none;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-6 text-slate-800">
+
+    <div id="web-interface" class="max-w-5xl mx-auto flex flex-col items-center gap-6">
+        
+        <header class="bg-white rounded-3xl p-5 shadow-lg border-4 border-amber-300 w-full text-center">
+            <span class="text-xs font-bold uppercase tracking-widest bg-amber-100 text-amber-800 px-3 py-1 rounded-full">
+                Літературна майстерня • Домашній театр
+            </span>
+            <h1 class="title-font text-3xl sm:text-4xl font-extrabold text-amber-900 mt-2">
+                Жовтогриве Левеня
+            </h1>
+            <p class="text-sm font-semibold text-slate-500 mt-1">
+                Роздрукуй, розфарбуй та зіграй власну сценку! ✂️ 🦁🎨
+            </p>
+        </header>
+
+        <!-- ГОЛОВНА ПАНЕЛЬ НАВІГАЦІЇ -->
+        <div class="flex flex-wrap justify-center gap-2 bg-white/90 p-3 rounded-2xl border-2 border-slate-200 shadow-md">
+            <button type="button" onclick="showPage(1)" id="btn-p1" class="nav-btn active">
+                📖 1. Казка (Колір)
+            </button>
+            <button type="button" onclick="showPage(2)" id="btn-p2" class="nav-btn">
+                🎨 2. Розмальовка (Левеня)
+            </button>
+            <button type="button" onclick="showPage(3)" id="btn-p3" class="nav-btn">
+                🎭 3. Розмальовка (Сценка)
+            </button>
+            <button type="button" onclick="showPage(4)" id="btn-p4" class="nav-btn">
+                ✂️ 4. Маска А4 (2 листи)
+            </button>
+            <button type="button" onclick="window.print()" class="ml-2 px-5 py-2 rounded-xl font-extrabold text-white bg-purple-600 hover:bg-purple-700 shadow-md cursor-pointer">
+                🖨️ Друк А4 (PDF)
+            </button>
+        </div>
+
+        <!-- ПЕРЕМИКАЧ ДЛЯ 4-Ї ВКЛАДКИ (З'являється під головним меню при виборі "4. Маска А4") -->
+        <div id="mask-subnav">
+            <button type="button" onclick="showMaskSheet(1)" id="btn-mask-1" class="sub-btn active">
+                🎭 Аркуш 1: Викрійка маски (page4.jpg)
+            </button>
+            <button type="button" onclick="showMaskSheet(2)" id="btn-mask-2" class="sub-btn">
+                📏 Аркуш 2: Універсальне кріплення (page5.jpg)
+            </button>
+        </div>
+
+        <!-- КОНТЕЙНЕР ПЕРЕГЛЯДУ СТОРІНОК -->
+        <div class="w-full max-w-4xl bg-white rounded-3xl border-4 border-slate-800 shadow-2xl overflow-hidden relative" style="aspect-ratio: 1.414;">
+            
+            <!-- СТОРІНКА 1 -->
+            <div id="page-1" class="page-slide active">
+                <img src="page1.jpg" alt="Сторінка 1" class="w-full h-full object-contain">
+            </div>
+
+            <!-- СТОРІНКА 2 -->
+            <div id="page-2" class="page-slide">
+                <img src="page2.jpg" alt="Сторінка 2" class="w-full h-full object-contain">
+            </div>
+
+            <!-- СТОРІНКА 3 -->
+            <div id="page-3" class="page-slide">
+                <img src="page3.jpg" alt="Сторінка 3" class="w-full h-full object-contain">
+            </div>
+
+            <!-- СТОРІНКА 4 (Містить page4.jpg та page5.jpg) -->
+            <div id="page-4" class="page-slide">
+                <!-- Лист 1: Маска (page4.jpg) -->
+                <div id="mask-sheet-1" style="display: block; width: 100%; height: 100%;">
+                    <img src="page4.jpg" alt="Сторінка 4: Маска" class="w-full h-full object-contain">
+                </div>
+
+                <!-- Лист 2: П'ЯТА СТОРІНКА — Універсальне кріплення (page5.jpg) -->
+                <div id="mask-sheet-2" style="display: none; width: 100%; height: 100%;">
+                    <img src="page5.jpg" alt="Сторінка 5: Універсальне кріплення" class="w-full h-full object-contain">
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ОБЛАСТЬ ДРУКУ (Усі 5 сторінок, включно з page5.jpg) -->
+    <div id="print-area">
+        <div class="print-page">
+            <img src="page1.jpg" class="w-full h-full object-contain">
+        </div>
+        <div class="print-page">
+            <img src="page2.jpg" class="w-full h-full object-contain">
+        </div>
+        <div class="print-page">
+            <img src="page3.jpg" class="w-full h-full object-contain">
+        </div>
+        <div class="print-page">
+            <img src="page4.jpg" class="w-full h-full object-contain">
+        </div>
+        <!-- Ось посилання на 5-ту сторінку для друку -->
+        <div class="print-page">
+            <img src="page5.jpg" class="w-full h-full object-contain">
+        </div>
+    </div>
+
+    <script>
+        function showPage(pageNumber) {
+            for (var i = 1; i <= 4; i++) {
+                document.getElementById('page-' + i).classList.remove('active');
+                document.getElementById('btn-p' + i).classList.remove('active');
+            }
+            document.getElementById('page-' + pageNumber).classList.add('active');
+            document.getElementById('btn-p' + pageNumber).classList.add('active');
+
+            // Показуємо додатковий перемикач тільки на 4-й вкладці
+            var subnav = document.getElementById('mask-subnav');
+            if (pageNumber === 4) {
+                subnav.classList.add('visible');
+            } else {
+                subnav.classList.remove('visible');
+            }
+        }
+
+        function showMaskSheet(sheetNumber) {
+            var sheet1 = document.getElementById('mask-sheet-1');
+            var sheet2 = document.getElementById('mask-sheet-2');
+            var btn1 = document.getElementById('btn-mask-1');
+            var btn2 = document.getElementById('btn-mask-2');
+
+            if (sheetNumber === 1) {
+                sheet1.style.display = 'block';
+                sheet2.style.display = 'none';
+                btn1.classList.add('active');
+                btn2.classList.remove('active');
+            } else {
+                sheet1.style.display = 'none';
+                sheet2.style.display = 'block';
+                btn1.classList.remove('active');
+                btn2.classList.add('active');
+            }
+        }
+    </script>
+
+</body>
+</html>
